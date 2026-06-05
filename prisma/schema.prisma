@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String
+  partnerId    String?   @unique
+  partner      Partner?  @relation(fields: [partnerId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Partner {
+  id          String                  @id @default(cuid())
+  code        String                  @unique
+  name        String
+  email       String                  @unique
+  isActive    Boolean                 @default(true)
+  user        User?
+  earnings    ProjectPartnerEarning[]
+  payouts     Payout[]
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+}
+
+model Project {
+  id                      String                  @id @default(cuid())
+  name                    String
+  clientName              String
+  clientEmail             String?
+  clientPhone             String?
+  description             String?
+  projectValue            Float
+  amountReceived          Float                   @default(0)
+  amountPending           Float                   @default(0)
+  expensesTotal           Float                   @default(0)
+  netProfit               Float                   @default(0)
+  leadPool                Float                   @default(0)
+  developerPool           Float                   @default(0)
+  status                  String
+  startDate               DateTime?
+  deliveryDate            DateTime?
+  paymentDueDate          DateTime?
+  notes                   String?
+  leadContributorCodes    String
+  developerContributorCodes String
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+  earnings                ProjectPartnerEarning[]
+  expenses                Expense[]
+  payments                Payment[]
+}
+
+model ProjectPartnerEarning {
+  id               String           @id @default(cuid())
+  projectId        String
+  partnerId        String
+  contributionType String
+  percentage       Float
+  amount           Float
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  project          Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  partner          Partner          @relation(fields: [partnerId], references: [id])
+
+  @@unique([projectId, partnerId, contributionType])
+}
+
+model Expense {
+  id         String          @id @default(cuid())
+  title      String
+  amount     Float
+  date       DateTime
+  category   String
+  notes      String?
+  projectId  String?
+  project    Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+}
+
+model Payment {
+  id            String       @id @default(cuid())
+  projectId     String
+  paymentDate   DateTime
+  amount        Float
+  paymentMode   String
+  transactionId String?
+  notes         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Payout {
+  id          String      @id @default(cuid())
+  partnerId   String
+  amount      Float
+  date        DateTime
+  paymentMode String
+  remarks     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  partner     Partner     @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

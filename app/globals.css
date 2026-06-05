@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 36 43% 96%;
+  --foreground: 20 20% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 20% 12%;
+  --primary: 158 64% 24%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 38 60% 90%;
+  --secondary-foreground: 26 32% 18%;
+  --muted: 32 26% 92%;
+  --muted-foreground: 24 12% 38%;
+  --accent: 15 80% 92%;
+  --accent-foreground: 20 20% 12%;
+  --destructive: 0 68% 47%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 26 22% 84%;
+  --input: 26 22% 84%;
+  --ring: 158 64% 24%;
+  --radius: 1rem;
+  --font-sans: "Manrope", sans-serif;
+}
+
+.dark {
+  --background: 156 22% 8%;
+  --foreground: 38 24% 92%;
+  --card: 158 20% 10%;
+  --card-foreground: 38 24% 92%;
+  --primary: 36 88% 68%;
+  --primary-foreground: 156 22% 8%;
+  --secondary: 160 18% 16%;
+  --secondary-foreground: 38 24% 92%;
+  --muted: 160 18% 14%;
+  --muted-foreground: 38 10% 68%;
+  --accent: 18 48% 18%;
+  --accent-foreground: 38 24% 92%;
+  --destructive: 0 62% 52%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 160 18% 18%;
+  --input: 160 18% 18%;
+  --ring: 36 88% 68%;
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+  background-image:
+    radial-gradient(circle at top left, rgba(255, 215, 156, 0.3), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(35, 122, 87, 0.2), transparent 22%);
+}
+
+* {
+  @apply border-border;
+}
