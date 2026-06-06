@@ -11,6 +11,7 @@ async function main() {
   await prisma.expense.deleteMany();
   await prisma.payout.deleteMany();
   await prisma.project.deleteMany();
+  await prisma.task.deleteMany();
   await prisma.user.deleteMany();
   await prisma.partner.deleteMany();
   await prisma.notification.deleteMany();
@@ -24,7 +25,7 @@ async function main() {
     prisma.partner.create({ data: { code: partnerCodes.Mahrishi, name: "Mahrishi Gunani", email: "mahrishi@weblockin.local" } })
   ]);
 
-  await prisma.user.create({
+  const adminUser = await prisma.user.create({
     data: {
       name: "Admin User",
       email: "admin@weblockin.local",
@@ -33,7 +34,7 @@ async function main() {
     }
   });
 
-  await Promise.all([
+  const [userAshish, userKush, userAnkit, userMahrishi] = await Promise.all([
     prisma.user.create({ data: { name: "Ashish Sharma", email: "ashish@weblockin.local", passwordHash, role: roles.PARTNER, partnerId: partnerAshish.id } }),
     prisma.user.create({ data: { name: "Kush Sharma", email: "kush@weblockin.local", passwordHash, role: roles.PARTNER, partnerId: partnerKush.id } }),
     prisma.user.create({ data: { name: "Ankit Verma", email: "ankit@weblockin.local", passwordHash, role: roles.PARTNER, partnerId: partnerAnkit.id } }),
@@ -111,6 +112,55 @@ async function main() {
       { partnerId: partnerAshish.id, amount: 70000, date: new Date("2026-05-10"), paymentMode: paymentModes.BANK_TRANSFER, remarks: "Monthly payout" },
       { partnerId: partnerAnkit.id, amount: 20000, date: new Date("2026-05-10"), paymentMode: paymentModes.UPI, remarks: "Lead payout" },
       { partnerId: partnerMahrishi.id, amount: 38000, date: new Date("2026-05-28"), paymentMode: paymentModes.BANK_TRANSFER, remarks: "Project payout" }
+    ]
+  });
+
+  await prisma.task.createMany({
+    data: [
+      {
+        title: "Framer High-Fidelity Mockups",
+        description: "Design and export Framer mockups for the landing page.",
+        status: "COMPLETED",
+        dueDate: new Date("2026-05-15"),
+        projectId: projectOne.id,
+        assignedToId: userAshish.id,
+        createdById: adminUser.id
+      },
+      {
+        title: "Stripe API Integration",
+        description: "Implement billing cycles and webhook listeners.",
+        status: "IN_PROGRESS",
+        dueDate: new Date("2026-06-18"),
+        projectId: projectOne.id,
+        assignedToId: userAshish.id,
+        createdById: adminUser.id
+      },
+      {
+        title: "Database Index Optimization",
+        description: "Analyze slow query logs and index foreign keys.",
+        status: "COMPLETED",
+        dueDate: new Date("2026-04-10"),
+        projectId: projectTwo.id,
+        assignedToId: userKush.id,
+        createdById: adminUser.id
+      },
+      {
+        title: "Feedback Form Bugfix",
+        description: "Fix submit handler error on mobile browsers.",
+        status: "PENDING",
+        dueDate: new Date("2026-06-25"),
+        projectId: projectTwo.id,
+        assignedToId: userAnkit.id,
+        createdById: userAshish.id
+      },
+      {
+        title: "Domain and SSL setup",
+        description: "Map domain to Vercel and renew SSL certificate.",
+        status: "PENDING",
+        dueDate: new Date("2026-06-10"),
+        assignedToId: userMahrishi.id,
+        createdById: adminUser.id
+      }
     ]
   });
 

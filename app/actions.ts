@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { expenseSchema, paymentSchema, payoutSchema, projectSchema } from "@/lib/validations";
+import { expenseSchema, paymentSchema, payoutSchema, projectSchema, taskSchema } from "@/lib/validations";
 import { recalculateProjectFinancials } from "@/lib/project-financials";
 
 async function requireAdmin() {
@@ -208,3 +208,126 @@ export async function deletePayout(id: string) {
   revalidatePath("/ledger");
   revalidatePath("/dashboard");
 }
+
+async function requireUser() {
+  const session = await auth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+  return session;
+}
+
+export async function saveTask(formData: FormData) {
+  const session = await requireUser();
+  const data = taskSchema.parse({
+    id: formData.get("id") || undefined,
+    title: formData.get("title"),
+    description: formData.get("description") || undefined,
+    status: formData.get("status"),
+    dueDate: formData.get("dueDate") || undefined,
+    projectId: formData.get("projectId") || undefined,
+    assignedToId: formData.get("assignedToId")
+  });
+
+  const payload = {
+    title: data.title,
+    description: data.description || null,
+    status: data.status,
+    dueDate: data.dueDate ? new Date(data.dueDate) : null,
+    projectId: data.projectId || null,
+    assignedToId: data.assignedToId,
+    createdById: session.user.id
+  };
+
+  if (data.id) {
+    const oldTask = await prisma.task.findUnique({ where: { id: data.id } });
+    await prisma.task.update({
+      where: { id: data.id },
+      data: {
+        title: payload.title,
+        description: payload.description,
+        status: payload.status,
+        dueDate: payload.dueDate,
+        projectId: payload.projectId,
+        assignedToId: payload.assignedToId
+      }
+    });
+
+    if (oldTask) {
+      const messages: string[] = [];
+      if (oldTask.assignedToId !== payload.assignedToId) {
+        const assignee = await prisma.user.findUnique({ where: { id: payload.assignedToId } });
+        messages.push(`reassigned task "${payload.title}" to ${assignee?.name || "a team member"}`);
+      }
+      if (oldTask.status !== payload.status) {
+        messages.push(`changed status of "${payload.title}" to ${payload.status.replaceAll("_", " ")}`);
+      }
+      if (messages.length > 0) {
+        await prisma.notification.create({
+          data: {
+            title: `Task Updated`,
+            message: `${session.user.name} ${messages.join(" and ")}.`
+          }
+        });
+      }
+    }
+  } else {
+    await prisma.task.create({
+      data: payload
+    });
+
+    const assignee = await prisma.user.findUnique({ where: { id: payload.assignedToId } });
+    await prisma.notification.create({
+      data: {
+        title: `New Task Assigned`,
+        message: `${session.user.name} assigned task "${payload.title}" to ${assignee?.name || "a team member"}.`
+      }
+    });
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/tasks");
+}
+
+export async function updateTaskStatus(id: string, status: string) {
+  const session = await requireUser();
+  const task = await prisma.task.findUnique({ where: { id } });
+  if (!task) throw new Error("Task not found");
+
+  const oldStatus = task.status;
+  await prisma.task.update({
+    where: { id },
+    data: { status }
+  });
+
+  if (oldStatus !== status) {
+    await prisma.notification.create({
+      data: {
+        title: `Task Status Updated`,
+        message: `${session.user.name} moved task "${task.title}" to ${status.replaceAll("_", " ")}.`
+      }
+    });
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/tasks");
+}
+
+export async function deleteTask(id: string) {
+  const session = await requireUser();
+  const task = await prisma.task.findUnique({ where: { id } });
+  await prisma.task.delete({ where: { id } });
+
+  if (task) {
+    await prisma.notification.create({
+      data: {
+        title: `Task Deleted`,
+        message: `${session.user.name} deleted task "${task.title}".`
+      }
+    });
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/tasks");
+}
+

@@ -50,3 +50,13 @@ export const payoutSchema = z.object({
   paymentMode: z.enum(["UPI", "BANK_TRANSFER", "CASH", "CHEQUE", "PAYPAL", "RAZORPAY"]),
   remarks: z.string().optional()
 });
+
+export const taskSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(2),
+  description: z.string().optional(),
+  status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"]),
+  dueDate: z.string().optional().or(z.literal("")),
+  projectId: z.string().optional().or(z.literal("")),
+  assignedToId: z.string().min(1)
+});

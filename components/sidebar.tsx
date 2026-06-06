@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, BriefcaseBusiness, CreditCard, DollarSign, LayoutDashboard, Receipt, Users, Wallet } from "lucide-react";
+import { BarChart3, BriefcaseBusiness, CheckSquare, CreditCard, DollarSign, LayoutDashboard, Receipt, Users, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/projects", label: "Projects", icon: BriefcaseBusiness },
+  { href: "/tasks", label: "Tasks", icon: CheckSquare },
   { href: "/expenses", label: "Expenses", icon: Receipt },
   { href: "/payments", label: "Payments", icon: CreditCard },
   { href: "/payouts", label: "Payouts", icon: Wallet },
@@ -26,7 +27,7 @@ export function Sidebar({ isPartner }: { isPartner: boolean }) {
       </div>
       <nav className="space-y-1">
         {links.map((link) => {
-          if (isPartner && !["/dashboard", "/projects", "/payments", "/payouts", "/ledger", "/reports", "/exports"].includes(link.href)) {
+          if (isPartner && !["/dashboard", "/projects", "/tasks", "/payments", "/payouts", "/ledger", "/reports", "/exports"].includes(link.href)) {
             return null;
           }
 
