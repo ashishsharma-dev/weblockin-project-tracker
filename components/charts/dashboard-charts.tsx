@@ -1,8 +1,10 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
+
+const PIE_COLORS = ["#3b82f6", "#6366f1", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444"];
 
 export function RevenueProfitChart({ data }: { data: { month: string; revenue: number; profit: number }[] }) {
   return (
@@ -18,8 +20,8 @@ export function RevenueProfitChart({ data }: { data: { month: string; revenue: n
             <YAxis tickFormatter={formatCurrency} />
             <Tooltip formatter={(value: number) => formatCurrency(value)} />
             <Legend />
-            <Bar dataKey="revenue" fill="#1d7b57" radius={[8, 8, 0, 0]} />
-            <Bar dataKey="profit" fill="#edae49" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="revenue" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="profit" fill="#10b981" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -36,7 +38,11 @@ export function ExpenseBreakdownChart({ data }: { data: { name: string; value: n
       <CardContent className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={data} dataKey="value" nameKey="name" outerRadius={100} fill="#c46b48" />
+            <Pie data={data} dataKey="value" nameKey="name" outerRadius={100} label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}>
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+              ))}
+            </Pie>
             <Tooltip formatter={(value: number) => formatCurrency(value)} />
           </PieChart>
         </ResponsiveContainer>
@@ -44,3 +50,4 @@ export function ExpenseBreakdownChart({ data }: { data: { name: string; value: n
     </Card>
   );
 }
+

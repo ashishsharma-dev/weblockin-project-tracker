@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
 import { auth } from "@/auth";
+import { AddEntryDialog } from "@/components/add-entry-dialog";
 
 export default async function TasksPage({
   searchParams
@@ -51,12 +52,12 @@ export default async function TasksPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Task Board" description="Assign deliverables, set task deadlines, and monitor completion progress." />
+      <PageHeader title="Task Board" description="Assign deliverables, set task deadlines, and monitor completion progress.">
+        <AddEntryDialog title="Assign New Task" buttonText="Add Task">
+          <TaskForm projects={projects} users={users} />
+        </AddEntryDialog>
+      </PageHeader>
 
-      {/* Task Creation Form (Visible to anyone logged in) */}
-      <DataTableCard title="Assign New Task">
-        <TaskForm projects={projects} users={users} />
-      </DataTableCard>
 
       {/* Filters & View Switcher */}
       <DataTableCard title="Filters & View Options" description="Filter tasks or switch between Table and Kanban Board layout.">

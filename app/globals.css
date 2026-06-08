@@ -3,54 +3,122 @@
 @tailwind utilities;
 
 :root {
-  --background: 36 43% 96%;
-  --foreground: 20 20% 12%;
+  --background: 220 20% 97%;
+  --foreground: 224 71% 4%;
   --card: 0 0% 100%;
-  --card-foreground: 20 20% 12%;
-  --primary: 158 64% 24%;
+  --card-foreground: 224 71% 4%;
+  --primary: 221 83% 53%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 38 60% 90%;
-  --secondary-foreground: 26 32% 18%;
-  --muted: 32 26% 92%;
-  --muted-foreground: 24 12% 38%;
-  --accent: 15 80% 92%;
-  --accent-foreground: 20 20% 12%;
-  --destructive: 0 68% 47%;
+  --secondary: 220 14% 91%;
+  --secondary-foreground: 224 71% 4%;
+  --muted: 220 14% 93%;
+  --muted-foreground: 220 9% 46%;
+  --accent: 221 83% 96%;
+  --accent-foreground: 221 83% 53%;
+  --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 26 22% 84%;
-  --input: 26 22% 84%;
-  --ring: 158 64% 24%;
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: 221 83% 53%;
   --radius: 1rem;
   --font-sans: "Manrope", sans-serif;
 }
 
 .dark {
-  --background: 156 22% 8%;
-  --foreground: 38 24% 92%;
-  --card: 158 20% 10%;
-  --card-foreground: 38 24% 92%;
-  --primary: 36 88% 68%;
-  --primary-foreground: 156 22% 8%;
-  --secondary: 160 18% 16%;
-  --secondary-foreground: 38 24% 92%;
-  --muted: 160 18% 14%;
-  --muted-foreground: 38 10% 68%;
-  --accent: 18 48% 18%;
-  --accent-foreground: 38 24% 92%;
-  --destructive: 0 62% 52%;
+  --background: 222 47% 6%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 9%;
+  --card-foreground: 210 40% 98%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 222 47% 6%;
+  --secondary: 222 47% 13%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 222 47% 12%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 217 50% 15%;
+  --accent-foreground: 217 91% 60%;
+  --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 160 18% 18%;
-  --input: 160 18% 18%;
-  --ring: 36 88% 68%;
+  --border: 222 47% 12%;
+  --input: 222 47% 12%;
+  --ring: 217 91% 60%;
 }
 
 body {
   @apply bg-background text-foreground antialiased;
   background-image:
-    radial-gradient(circle at top left, rgba(255, 215, 156, 0.3), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(35, 122, 87, 0.2), transparent 22%);
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.08), transparent 24%);
 }
+
+.dark body {
+  background-image:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.07), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.04), transparent 26%);
+}
+
 
 * {
   @apply border-border;
 }
+
+@keyframes dialog-overlay-show {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes dialog-overlay-hide {
+  from {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+  to {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+}
+
+@keyframes dialog-content-show {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes dialog-content-hide {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+}
+
+.animate-dialog-overlay-show {
+  animation: dialog-overlay-show 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-dialog-overlay-hide {
+  animation: dialog-overlay-hide 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-dialog-content-show {
+  animation: dialog-content-show 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-dialog-content-hide {
+  animation: dialog-content-hide 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

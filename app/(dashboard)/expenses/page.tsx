@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { AddEntryDialog } from "@/components/add-entry-dialog";
 
 export default async function ExpensesPage() {
   const session = await auth();
@@ -21,12 +22,14 @@ export default async function ExpensesPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Expenses" description="Keep project costs accurate so partner earnings always reflect real net profit." />
-      {session?.user.role === "ADMIN" ? (
-        <DataTableCard title="Log Expense">
-          <ExpenseForm projects={projects} />
-        </DataTableCard>
-      ) : null}
+      <PageHeader title="Expenses" description="Keep project costs accurate so partner earnings always reflect real net profit.">
+        {session?.user.role === "ADMIN" ? (
+          <AddEntryDialog title="Log Expense" buttonText="Log Expense">
+            <ExpenseForm projects={projects} />
+          </AddEntryDialog>
+        ) : null}
+      </PageHeader>
+
       <DataTableCard title="Expense Register">
         <Table>
           <TableHeader>

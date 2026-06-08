@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { auth } from "@/auth";
+import { AddEntryDialog } from "@/components/add-entry-dialog";
 
 export default async function PayoutsPage() {
   const session = await auth();
@@ -21,12 +22,14 @@ export default async function PayoutsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Payouts" description="Track partner disbursements and keep pending balances visible." />
-      {session?.user.role === "ADMIN" ? (
-        <DataTableCard title="Create Payout">
-          <PayoutForm partners={partners} />
-        </DataTableCard>
-      ) : null}
+      <PageHeader title="Payouts" description="Track partner disbursements and keep pending balances visible.">
+        {session?.user.role === "ADMIN" ? (
+          <AddEntryDialog title="Create Payout" buttonText="Create Payout">
+            <PayoutForm partners={partners} />
+          </AddEntryDialog>
+        ) : null}
+      </PageHeader>
+
       <DataTableCard title="Payout Register">
         <Table>
           <TableHeader>

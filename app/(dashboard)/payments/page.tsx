@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { auth } from "@/auth";
 import { getScopedProjects } from "@/lib/data";
+import { AddEntryDialog } from "@/components/add-entry-dialog";
 
 export default async function PaymentsPage() {
   const session = await auth();
@@ -31,12 +32,14 @@ export default async function PaymentsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Payments" description="Watch incoming client collections and their impact on pending dues." />
-      {session?.user.role === "ADMIN" ? (
-        <DataTableCard title="Record Payment">
-          <PaymentForm projects={projects.map((project) => ({ id: project.id, name: project.name }))} />
-        </DataTableCard>
-      ) : null}
+      <PageHeader title="Payments" description="Watch incoming client collections and their impact on pending dues.">
+        {session?.user.role === "ADMIN" ? (
+          <AddEntryDialog title="Record Payment" buttonText="Record Payment">
+            <PaymentForm projects={projects.map((project) => ({ id: project.id, name: project.name }))} />
+          </AddEntryDialog>
+        ) : null}
+      </PageHeader>
+
       <DataTableCard title="Payment Register">
         <Table>
           <TableHeader>

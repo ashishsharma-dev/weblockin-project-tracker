@@ -11,6 +11,7 @@ import { auth } from "@/auth";
 import { getScopedProjects } from "@/lib/data";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { EmptyState } from "@/components/empty-state";
+import { AddEntryDialog } from "@/components/add-entry-dialog";
 
 export default async function ProjectsPage() {
   const session = await auth();
@@ -18,12 +19,13 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Projects" description="Track delivery, collections, and automated profit splits project by project." />
-      {session?.user.role === "ADMIN" ? (
-        <DataTableCard title="Create Project" description="Server-side profit calculations run automatically whenever a project changes.">
-          <ProjectForm />
-        </DataTableCard>
-      ) : null}
+      <PageHeader title="Projects" description="Track delivery, collections, and automated profit splits project by project.">
+        {session?.user.role === "ADMIN" ? (
+          <AddEntryDialog title="Create Project" buttonText="Add Project" description="Server-side profit calculations run automatically whenever a project changes.">
+            <ProjectForm />
+          </AddEntryDialog>
+        ) : null}
+      </PageHeader>
       <DataTableCard title="Project Register">
         {projects.length ? (
           <Table>
