@@ -42,6 +42,11 @@ export async function getDashboardMetrics() {
     }
   });
   const expenses = await prisma.expense.findMany();
+  const openLeads = await prisma.leadSheet.count({
+    where: session.user.role === "PARTNER"
+      ? { assignedToId: session.user.id, status: { not: "COMPLETED" } }
+      : { status: { not: "COMPLETED" } }
+  });
 
   const totalRevenue = projects.reduce((sum, project) => sum + Number(project.projectValue), 0);
   const totalExpenses = projects.reduce((sum, project) => sum + Number(project.expensesTotal), 0);
@@ -83,6 +88,7 @@ export async function getDashboardMetrics() {
     pendingClientPayments,
     completedProjects,
     activeProjects,
+    openLeads,
     partnerWise,
     monthlySeries: [...monthlyMap.entries()].map(([month, values]) => ({ month, ...values })),
     expenseBreakdown: Object.entries(expenseByCategory).map(([name, value]) => ({ name, value }))

@@ -40,8 +40,8 @@ export default async function DashboardPage() {
         <MetricCard label="Total Expenses" value={metrics.totalExpenses} currency />
         <MetricCard label="Net Profit" value={metrics.netProfit} currency />
         <MetricCard label="Pending Client Payments" value={metrics.pendingClientPayments} currency />
-        <MetricCard label="Completed Projects" value={metrics.completedProjects} />
         <MetricCard label="Active Projects" value={metrics.activeProjects} />
+        <MetricCard label="Open Leads" value={metrics.openLeads} />
       </div>
       
       <div className="grid gap-6 xl:grid-cols-2">

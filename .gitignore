@@ -38,3 +38,7 @@ next-env.d.ts
 
 # agent scratch files
 /scratch
+
+# public uploads
+/public/uploads
+

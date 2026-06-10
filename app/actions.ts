@@ -5,6 +5,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { expenseSchema, paymentSchema, payoutSchema, projectSchema, taskSchema } from "@/lib/validations";
 import { recalculateProjectFinancials } from "@/lib/project-financials";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 
 async function requireAdmin() {
   const session = await auth();
@@ -329,5 +331,121 @@ export async function deleteTask(id: string) {
 
   revalidatePath("/dashboard");
   revalidatePath("/tasks");
+}
+
+export async function saveLeadSheet(formData: FormData) {
+  const session = await requireUser();
+  if (session.user.role !== "ADMIN") {
+    throw new Error("Unauthorized");
+  }
+
+  const name = formData.get("name") as string;
+  const assignedToId = formData.get("assignedToId") as string;
+  const notes = formData.get("notes") as string || null;
+  const givenFile = formData.get("givenFile") as File;
+
+  if (!name || !assignedToId || !givenFile || givenFile.size === 0) {
+    throw new Error("Missing required fields");
+  }
+
+  // Save the uploaded file
+  const bytes = await givenFile.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const uniqueName = `${Date.now()}-${givenFile.name.replace(/\s+/g, "_")}`;
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  await mkdir(uploadDir, { recursive: true });
+  const filePath = path.join(uploadDir, uniqueName);
+  await writeFile(filePath, buffer);
+  const givenSheetUrl = `/uploads/${uniqueName}`;
+
+  await prisma.leadSheet.create({
+    data: {
+      name,
+      assignedToId,
+      notes,
+      givenSheetName: givenFile.name,
+      givenSheetUrl,
+      status: "PENDING"
+    }
+  });
+
+  // Create a notification for the employee
+  const assignee = await prisma.user.findUnique({ where: { id: assignedToId } });
+  await prisma.notification.create({
+    data: {
+      title: "New Lead Sheet Assigned",
+      message: `${session.user.name} assigned lead sheet "${name}" to ${assignee?.name || "you"}.`
+    }
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/leads");
+}
+
+export async function uploadResponseSheet(formData: FormData) {
+  const session = await requireUser();
+  const leadSheetId = formData.get("leadSheetId") as string;
+  const responseFile = formData.get("responseFile") as File;
+
+  if (!leadSheetId || !responseFile || responseFile.size === 0) {
+    throw new Error("Missing required fields");
+  }
+
+  const leadSheet = await prisma.leadSheet.findUnique({
+    where: { id: leadSheetId }
+  });
+
+  if (!leadSheet) {
+    throw new Error("Lead sheet not found");
+  }
+
+  // Verify authorization (only assignee or admin)
+  if (session.user.role !== "ADMIN" && leadSheet.assignedToId !== session.user.id) {
+    throw new Error("Unauthorized");
+  }
+
+  // Save the response file
+  const bytes = await responseFile.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const uniqueName = `${Date.now()}-${responseFile.name.replace(/\s+/g, "_")}`;
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  await mkdir(uploadDir, { recursive: true });
+  const filePath = path.join(uploadDir, uniqueName);
+  await writeFile(filePath, buffer);
+  const responseSheetUrl = `/uploads/${uniqueName}`;
+
+  await prisma.leadSheet.update({
+    where: { id: leadSheetId },
+    data: {
+      status: "COMPLETED",
+      responseSheetName: responseFile.name,
+      responseSheetUrl
+    }
+  });
+
+  // Create notification for admin
+  await prisma.notification.create({
+    data: {
+      title: "Lead Sheet Completed",
+      message: `${session.user.name} uploaded response for lead sheet "${leadSheet.name}".`
+    }
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/leads");
+}
+
+export async function deleteLeadSheet(id: string) {
+  const session = await requireUser();
+  if (session.user.role !== "ADMIN") {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.leadSheet.delete({
+    where: { id }
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/leads");
 }
 

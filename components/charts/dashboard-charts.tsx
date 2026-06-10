@@ -17,7 +17,7 @@ export function RevenueProfitChart({ data }: { data: { month: string; revenue: n
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" />
-            <YAxis tickFormatter={formatCurrency} />
+            <YAxis tickFormatter={formatCurrency} width={85} domain={[0, "auto"]} />
             <Tooltip formatter={(value: number) => formatCurrency(value)} />
             <Legend />
             <Bar dataKey="revenue" fill="#3b82f6" radius={[8, 8, 0, 0]} />
@@ -38,12 +38,19 @@ export function ExpenseBreakdownChart({ data }: { data: { name: string; value: n
       <CardContent className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={data} dataKey="value" nameKey="name" outerRadius={100} label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}>
+            <Pie 
+              data={data} 
+              dataKey="value" 
+              nameKey="name" 
+              outerRadius={80} 
+              label={false}
+            >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
               ))}
             </Pie>
             <Tooltip formatter={(value: number) => formatCurrency(value)} />
+            <Legend verticalAlign="bottom" align="center" layout="horizontal" iconType="circle" />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>

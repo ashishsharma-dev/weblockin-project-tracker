@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, BriefcaseBusiness, CheckSquare, CreditCard, DollarSign, LayoutDashboard, Receipt, Users, Wallet } from "lucide-react";
+import { BarChart3, BriefcaseBusiness, CheckSquare, CreditCard, DollarSign, LayoutDashboard, Receipt, Target, Users, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/leads", label: "Leads", icon: Target },
   { href: "/projects", label: "Projects", icon: BriefcaseBusiness },
   { href: "/tasks", label: "Tasks", icon: CheckSquare },
   { href: "/expenses", label: "Expenses", icon: Receipt },
@@ -21,13 +22,13 @@ export function Sidebar({ isPartner }: { isPartner: boolean }) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-full rounded-3xl border bg-card/90 p-4 shadow-sm md:w-72">
+    <aside className="w-full rounded-3xl border bg-card/90 p-4 shadow-sm md:w-72 md:sticky md:top-6 self-start">
       <div className="mb-8 p-2">
         <h2 className="text-2xl font-extrabold tracking-tight text-primary">Weblockin</h2>
       </div>
       <nav className="space-y-1">
         {links.map((link) => {
-          if (isPartner && !["/dashboard", "/projects", "/tasks", "/payments", "/payouts", "/ledger", "/reports", "/exports"].includes(link.href)) {
+          if (isPartner && !["/dashboard", "/leads", "/projects", "/tasks", "/payments", "/payouts", "/ledger", "/reports", "/exports"].includes(link.href)) {
             return null;
           }
 

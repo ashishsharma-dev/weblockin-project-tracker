@@ -20,6 +20,7 @@ model User {
   updatedAt    DateTime  @updatedAt
   assignedTasks Task[]   @relation("AssignedTasks")
   createdTasks  Task[]   @relation("CreatedTasks")
+  assignedLeads LeadSheet[] @relation("AssignedLeads")
 }
 
 model Partner {
@@ -139,4 +140,19 @@ model Task {
   createdBy    User      @relation("CreatedTasks", fields: [createdById], references: [id], onDelete: Cascade)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+model LeadSheet {
+  id                String   @id @default(cuid())
+  name              String
+  assignedToId      String
+  assignedTo        User     @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: Cascade)
+  status            String   @default("PENDING") // PENDING, COMPLETED
+  givenSheetName    String
+  givenSheetUrl     String
+  responseSheetName String?
+  responseSheetUrl  String?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
